@@ -70,10 +70,11 @@ static void MX_CAN1_Init(void);
 
 void Init_Tx_Can_Config()
 {   // Set Transmit parameters
-	pTxHeader.DLC = 1;
-	pTxHeader.IDE = CAN_ID_STD;
-	pTxHeader.RTR = CAN_RTR_DATA;
-	pTxHeader.StdId = 0x0155;
+	  pTxHeader.DLC = 1;
+	  pTxHeader.IDE = CAN_ID_STD;
+	  pTxHeader.RTR = CAN_RTR_DATA;
+	  pTxHeader.StdId = 0x0155;
+
 
 }
 
@@ -83,14 +84,13 @@ void Init_Filter_Can_Config()
 	sFilterConfig.FilterActivation =ENABLE;
 	sFilterConfig.FilterBank = 0;
 	sFilterConfig.FilterFIFOAssignment =CAN_FILTER_FIFO0;
-	sFilterConfig.FilterIdHigh = 0x0000;
+	sFilterConfig.FilterIdHigh = 0x0000<<5;
 	sFilterConfig.FilterIdLow = 0x0000;
 	sFilterConfig.FilterMaskIdHigh = 0x0000;
 	sFilterConfig.FilterMaskIdLow = 0x0000;
 	sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
 	sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
 	HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig);
-
 
 }
 /* USER CODE END 0 */
@@ -112,17 +112,6 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
-  // Start CAN Communication
-   HAL_CAN_Start(&hcan1);
-
-  // Enable Interrupt
-
-   HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
-
-   Init_Tx_Can_Config(); // Set Transmit Configuration
-   Init_Filter_Can_Config(); // Set Filter Parameters
-
-
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -136,7 +125,17 @@ int main(void)
   MX_GPIO_Init();
   MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
+  //Init_Tx_Can_Config(); // Set Transmit Configuration
 
+  // Start CAN Communication
+  HAL_CAN_Start(&hcan1);
+
+  // Enable Interrupt
+
+  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
+  //Set Transmit Configuration
+  Init_Tx_Can_Config();
+  Init_Filter_Can_Config(); // Set Filter Parameters
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -211,8 +210,8 @@ static void MX_CAN1_Init(void)
   hcan1.Init.Prescaler = 21;
   hcan1.Init.Mode = CAN_MODE_NORMAL;
   hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan1.Init.TimeSeg1 = CAN_BS1_1TQ;
-  hcan1.Init.TimeSeg2 = CAN_BS2_1TQ;
+  hcan1.Init.TimeSeg1 = CAN_BS1_10TQ;
+  hcan1.Init.TimeSeg2 = CAN_BS2_5TQ;
   hcan1.Init.TimeTriggeredMode = DISABLE;
   hcan1.Init.AutoBusOff = DISABLE;
   hcan1.Init.AutoWakeUp = DISABLE;
@@ -261,7 +260,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 1);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 
 }

@@ -57,12 +57,16 @@
 
 /* External variables --------------------------------------------------------*/
 extern CAN_HandleTypeDef hcan1;
+
 /* USER CODE BEGIN EV */
-extern uint8_t count;
+
 extern CAN_TxHeaderTypeDef pTxHeader;
 extern CAN_RxHeaderTypeDef pRxHeader;
 extern uint32_t pTxMailbox;
+
 extern uint8_t rCount;
+extern uint8_t count;
+
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -207,16 +211,18 @@ void SysTick_Handler(void)
 void EXTI0_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI0_IRQn 0 */
-  for(int i =0;i<1000000;i++);
-  for(int i =0;i<1000000;i++);
+  for(int i=0;i<1000000;i++);
+  //for(int i =0;i<1000000;i++);
   /* USER CODE END EXTI0_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+  //HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_15);
   /* USER CODE BEGIN EXTI0_IRQn 1 */
   if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0))
   {
 	  count++;
 	  HAL_CAN_AddTxMessage(&hcan1, &pTxHeader, &count, &pTxMailbox);
   }
+
   /* USER CODE END EXTI0_IRQn 1 */
 }
 
